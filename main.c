@@ -1,11 +1,11 @@
 #define _GNU_SOURCE
-#include <sched.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <sched.h>
 #include <termios.h>
 #include <pthread.h>
-#include <unistd.h>
 #include <sys/socket.h>
 #include <sys/syscall.h>
 #include <sys/ioctl.h>
@@ -15,8 +15,8 @@
 #include <dirent.h>
 #include <stdbool.h>
 
-#define SERVER_IP   "127.0.0.1"
-#define PORT_NO     5120
+#define SERVER_IP "127.0.0.1"
+#define PORT_NO   5120
 
 static int sock;
 static struct sockaddr_in addr;
@@ -32,21 +32,19 @@ void CreateSocket(bool server)
 
     if (server) {
         addr.sin_addr.s_addr = htonl(INADDR_ANY);
-        if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+        if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0)
             printf("Server socket couldn't be created.\n");
         listen(sock, 3);
-
         printf("Created server socket.\n");
+
     } else {
         char server_ip[] = SERVER_IP;
         struct hostent *host;
-
         if ((addr.sin_addr.s_addr = inet_addr(server_ip)) == INADDR_NONE) {
             if ((host = gethostbyname(server_ip)) == NULL)
                 printf("Socket couldn't get host by name.\n");
             memcpy(&addr.sin_addr.s_addr, host->h_addr_list[0], host->h_length);
         }
-
         printf("Created client socket.\n");
     }
 }
@@ -68,7 +66,7 @@ void *Server(void *param)
         printf("Waiting for client connection.\n");
 
         cli_length = sizeof(struct sockaddr_in);
-        res = accept(sock, (struct sockaddr *)&client, (socklen_t*)&cli_length);
+        res = accept(sock, (struct sockaddr*)&client, (socklen_t*)&cli_length);
         if (res < 0)
             printf("Server accept failed.\n");
         else
